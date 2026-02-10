@@ -165,6 +165,36 @@
 
       const normalizePromptMessage = (message = "") => message.replace(/\[ENTER\]/g, "").trim();
 
+      const getRecentContext = () => {
+        const lines = logArea.textContent
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        return lines.slice(-4).join("\n");
+      };
+
+      const buildPromptMessage = (question) => {
+        if (!question) {
+          return "Digite sua resposta:";
+        }
+
+        if (/^N[uú]mero:?$/i.test(question)) {
+          const context = getRecentContext();
+          return context ? `${context}\n\nDigite o número da opção:` : "Digite o número da opção:";
+        }
+
+        if (/1\.\[SIM\]\s*2\.\[N[AÃ]O\]/i.test(question)) {
+          return `${question}\n\nDigite 1 para SIM ou 2 para NÃO.`;
+        }
+
+        if (/\[1\].*\[2\]/.test(question) && /personagem/i.test(question)) {
+          return `${question}\n\nDigite 1 para Jhonny ou 2 para Amanda.`;
+        }
+
+        return question;
+      };
+
       const prompt = (message = "") => {
         const isOnlyEnter = message.trim() === "[ENTER]";
         const cleanMessage = normalizePromptMessage(message);
@@ -177,7 +207,7 @@
           return "";
         }
 
-        const question = cleanMessage || "Digite sua resposta:";
+        const question = buildPromptMessage(cleanMessage);
         const response = window.prompt(question);
         return response ?? "";
       };
