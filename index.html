@@ -163,11 +163,22 @@
         logArea.textContent = "";
       };
 
+      const normalizePromptMessage = (message = "") => message.replace(/\[ENTER\]/g, "").trim();
+
       const prompt = (message = "") => {
-        if (message) {
-          appendLog(message);
+        const isOnlyEnter = message.trim() === "[ENTER]";
+        const cleanMessage = normalizePromptMessage(message);
+
+        if (cleanMessage) {
+          appendLog(cleanMessage);
         }
-        const response = window.prompt(message);
+
+        if (isOnlyEnter || message.includes("[ENTER]")) {
+          return "";
+        }
+
+        const question = cleanMessage || "Digite sua resposta:";
+        const response = window.prompt(question);
         return response ?? "";
       };
 
